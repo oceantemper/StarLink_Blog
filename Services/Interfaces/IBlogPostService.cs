@@ -28,5 +28,7 @@ namespace StarLink_Blog.Services.Interfaces
         public Task<List<Tag>> GetBlogPostTags(int blogPostId);
 
         public Task RemoveAllBlogPostTagsAsync(int blogPostId);
+
+        public  IEnumerable<BlogPost> SearchBlogPosts(string searchString);
     }
 }

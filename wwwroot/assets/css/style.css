@@ -12390,3 +12390,8 @@ body.active-dark-mode .axil-footer-style-1 .footer-top .inner {
     color: #ffffff;
   }
 }
+
+
+.ck-editor__editable_inline {
+    min-height: 500px;
+}

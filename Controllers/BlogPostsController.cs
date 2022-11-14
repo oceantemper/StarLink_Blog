@@ -3,31 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.EntityFrameworkCore;
 using StarLink_Blog.Data;
 using StarLink_Blog.Extensions;
 using StarLink_Blog.Models;
 using StarLink_Blog.Services.Interfaces;
+using X.PagedList;
 
 namespace StarLink_Blog.Controllers
 {
-
     [Authorize(Roles = "Administrator")]
     public class BlogPostsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IImageService _imageService;
         private readonly IBlogPostService _blogPostService;
+        private readonly UserManager<BlogUser> _userManager;
 
         public BlogPostsController(ApplicationDbContext context,
                                      IImageService imageService, 
-                                     IBlogPostService blogPostService)
+                                     IBlogPostService blogPostService,
+                                     UserManager<BlogUser> userManager)
         {
             _context = context;
             _imageService = imageService;
             _blogPostService = blogPostService;
+            _userManager = userManager;
         }
 
         // GET: BlogPosts
@@ -37,6 +42,10 @@ namespace StarLink_Blog.Controllers
             var applicationDbContext = _context.BlogPosts.Include(b => b.Category);
             return View(await applicationDbContext.ToListAsync());
         }
+
+
+    
+
 
         // GET: BlogPosts/Details/5
         [AllowAnonymous]
@@ -62,6 +71,8 @@ namespace StarLink_Blog.Controllers
         }
 
         // GET: BlogPosts/Create
+        
+        [Authorize(Roles = "Administrator , Moderator")]
         public async Task<IActionResult> Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
@@ -74,10 +85,19 @@ namespace StarLink_Blog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator , Moderator")]
         public async Task<IActionResult> Create([Bind("Id,Title,Content,CategoryId,Abstract,IsDeleted,IsPublished,BlogPostImage")] BlogPost blogPost, IEnumerable<int> selectedTags)
         {
+
+
+
+            ModelState.Remove("CreatorId");
+
+
             if (ModelState.IsValid)
             {
+                blogPost.CreatorId = _userManager.GetUserId(User);
+
                 //Get Slug
 
                 if (!await _blogPostService.ValidateSlugAsync(blogPost.Title!,blogPost.Id))
@@ -110,6 +130,7 @@ namespace StarLink_Blog.Controllers
         }
 
         // GET: BlogPosts/Edit/5
+        [Authorize(Roles = "Administrator , Moderator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -136,6 +157,7 @@ namespace StarLink_Blog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator , Moderator")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,CreatedDate,LastUpdated,CategoryId,Slug,Abstract,IsDeleted,IsPublished,ImageData,ImageType, BlogPostImage")] BlogPost blogPost,IEnumerable<int> selectedTags)
         {
             if (id != blogPost.Id)
@@ -196,6 +218,7 @@ namespace StarLink_Blog.Controllers
         }
 
         // GET: BlogPosts/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.BlogPosts == null)
@@ -217,6 +240,7 @@ namespace StarLink_Blog.Controllers
         // POST: BlogPosts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.BlogPosts == null)
@@ -226,7 +250,8 @@ namespace StarLink_Blog.Controllers
             var blogPost = await _context.BlogPosts.FindAsync(id);
             if (blogPost != null)
             {
-                _context.BlogPosts.Remove(blogPost);
+                blogPost.IsDeleted = true;
+                
             }
             
             await _context.SaveChangesAsync();

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StarLink_Blog.Data;
@@ -11,9 +12,10 @@ using StarLink_Blog.Data;
 namespace StarLink_Blog.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221111163835_added_creator")]
+    partial class added_creator
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -191,7 +193,6 @@ namespace StarLink_Blog.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatorId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<byte[]>("ImageData")
@@ -476,9 +477,7 @@ namespace StarLink_Blog.Data.Migrations
 
                     b.HasOne("StarLink_Blog.Models.BlogUser", "Creator")
                         .WithMany("BlogPosts")
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreatorId");
 
                     b.Navigation("Category");
 
