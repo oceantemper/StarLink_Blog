@@ -158,7 +158,7 @@ namespace StarLink_Blog.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator , Moderator")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,CreatedDate,LastUpdated,CategoryId,Slug,Abstract,IsDeleted,IsPublished,ImageData,ImageType, BlogPostImage")] BlogPost blogPost,IEnumerable<int> selectedTags)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,CreatorId,CreatedDate,LastUpdated,CategoryId,Slug,Abstract,IsDeleted,IsPublished,ImageData,ImageType, BlogPostImage")] BlogPost blogPost,IEnumerable<int> selectedTags)
         {
             if (id != blogPost.Id)
             {

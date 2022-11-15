@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using StarLink_Blog.Data;
 using StarLink_Blog.Models;
 using StarLink_Blog.Services.Interfaces;
+using X.PagedList;
 
 namespace StarLink_Blog.Controllers
 {
@@ -29,21 +30,34 @@ namespace StarLink_Blog.Controllers
         }
 
         // GET: Categories/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id,int? pageNum)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            //lists navigation for the pages in the blog 
+            int pageSize = 3;
+            //if pageNum == null give it 1 
+            int page = pageNum ?? 1;
+
+          
+            IPagedList <BlogPost> blogPosts =  _context.BlogPosts
+                                                        .Where(b => b.CategoryId == id && b.IsDeleted == false && b.IsPublished == true)
+                                                         .Include(b => b.Comments)
+                                                         .Include(b => b.Category)
+                                                         .Include(b => b.Tags)
+                                                         .OrderByDescending(b => b.CreatedDate)
+                                                         .ToPagedList(page, pageSize);
+
+
+            if (blogPosts == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(blogPosts);
         }
 
         // GET: Categories/Create

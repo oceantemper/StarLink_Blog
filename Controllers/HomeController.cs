@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using StarLink_Blog.Data;
 using StarLink_Blog.Models;
 using StarLink_Blog.Services.Interfaces;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using X.PagedList;
 
 namespace StarLink_Blog.Controllers
@@ -36,7 +38,7 @@ namespace StarLink_Blog.Controllers
             return View(model);
         }
 
-
+       
 
 
         public async Task<IActionResult> SearchIndex(string searchString, int? pageNum)

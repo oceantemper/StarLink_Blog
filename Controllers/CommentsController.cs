@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -62,6 +64,7 @@ namespace StarLink_Blog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator , Moderator")]
         public async Task<IActionResult> Create([Bind("Id,BlogPostId,Body")] Comment comment,string? slug)
         {
 
@@ -99,9 +102,23 @@ namespace StarLink_Blog.Controllers
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<BlogUser>(), "Id", "Id", comment.AuthorId);
-            ViewData["BlogPostId"] = new SelectList(_context.BlogPosts, "Id", "Content", comment.BlogPostId);
-            return View(comment);
+
+            // if user is NOT administrator or mod 
+            if (User.IsInRole("Administrator") || User.IsInRole("Moderator") || comment.AuthorId == _userManager.GetUserId(User))
+            {
+                ViewData["AuthorId"] = new SelectList(_context.Set<BlogUser>(), "Id", "Id", comment.AuthorId);
+                ViewData["BlogPostId"] = new SelectList(_context.BlogPosts, "Id", "Content", comment.BlogPostId);
+                return View(comment);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+
+            //return error
+            //if user wrote comments, let them edit 
+         
         }
 
         // POST: Comments/Edit/5
@@ -109,14 +126,19 @@ namespace StarLink_Blog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator , Moderator")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BlogPostId,AuthorId,CreatedDate,LastUpdated,UpdateReason,Body")] Comment comment)
         {
             if (id != comment.Id)
             {
                 return NotFound();
             }
+            if (!User.IsInRole("Administrator") && User.IsInRole("Moderator") && comment.AuthorId != _userManager.GetUserId(User))
+            {
+                return Unauthorized();
+            }
 
-            if (ModelState.IsValid)
+                if (ModelState.IsValid)
             {
                 try
                 {
@@ -142,6 +164,8 @@ namespace StarLink_Blog.Controllers
         }
 
         // GET: Comments/Delete/5
+
+        [Authorize(Roles = "Administrator , Moderator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Comments == null)
