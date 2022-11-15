@@ -81,38 +81,48 @@ namespace StarLink_Blog.Data
 
         private static async Task SeedUsersAsync(ApplicationDbContext context, IConfiguration configuration, UserManager<BlogUser> userManager)
         {
-            if (!context.Users.Any(u => u.Email == _adminEmail))
+            try
             {
-                BlogUser adminUser = new()
+                if (!context.Users.Any(u => u.Email == _adminEmail))
                 {
-                    Email = _adminEmail,
-                    UserName = _adminEmail,
-                    FirstName = "Ocean",
-                    LastName = "Peña",
-                    EmailConfirmed = true,
+                    BlogUser adminUser = new()
+                    {
+                        Email = _adminEmail,
+                        UserName = _adminEmail,
+                        FirstName = "Ocean",
+                        LastName = "Peña",
+                        EmailConfirmed = true,
 
-                };
+                    };
 
-                await userManager.CreateAsync(adminUser, configuration["AdminPassword"] ?? Environment.GetEnvironmentVariable("AdminPassword"));
-                await userManager.AddToRoleAsync(adminUser, _adminRole);
+                    await userManager.CreateAsync(adminUser, configuration["AdminPassword"] ?? Environment.GetEnvironmentVariable("AdminPassword"));
+                    await userManager.AddToRoleAsync(adminUser, _adminRole);
+                }
+
+
+                if (!context.Users.Any(u => u.Email == _modEmail))
+                {
+                    BlogUser modUser = new()
+                    {
+                        Email = _modEmail,
+                        UserName = _modEmail,
+                        FirstName = "Ocean",
+                        LastName = "Peña",
+                        EmailConfirmed = true,
+
+                    };
+
+                    await userManager.CreateAsync(modUser, configuration["ModeratorPassword"] ?? Environment.GetEnvironmentVariable("ModeratorPassword"));
+                    await userManager.AddToRoleAsync(modUser, _modRole);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
 
-
-            if (!context.Users.Any(u => u.Email == _modEmail))
-            {
-                BlogUser modUser = new()
-                {
-                    Email = _modEmail,
-                    UserName = _modEmail,
-                    FirstName = "Ocean",
-                    LastName = "Peña",
-                    EmailConfirmed = true,
-
-                };
-
-                await userManager.CreateAsync(modUser, configuration["ModeratorPassword"] ?? Environment.GetEnvironmentVariable("ModeratorPassword"));
-                await userManager.AddToRoleAsync(modUser, _modRole);
-            }
+           
         }
     }
 }
