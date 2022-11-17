@@ -39,8 +39,9 @@ namespace StarLink_Blog.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.BlogPosts.Include(b => b.Category);
-            return View(await applicationDbContext.ToListAsync());
+            var blogPosts = (await _blogPostService.GetAllBlogPostsAsync())
+                                                          .Where(b => b.IsDeleted == false && b.IsPublished == true);
+            return View(blogPosts);
         }
 
 
