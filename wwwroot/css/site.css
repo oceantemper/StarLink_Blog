@@ -27,3 +27,22 @@ body {
     height: 1rem !important;
     margin: initial !important;
 }
+.tagcloud > .disabledTag {
+    background-color: lightgray;
+    color: gray;
+    font-weight: bold
+}
+
+.tagcloud a:hover {
+    color: white !important;
+}
+
+.tagcloud a {
+    color: black;
+}
+
+.tagcloud > .disabledTag:hover {
+    background-color: lightgray;
+    color: darkgray !important;
+    border-color: lightgray;
+}
