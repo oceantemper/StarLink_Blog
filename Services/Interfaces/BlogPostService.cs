@@ -41,6 +41,38 @@ namespace StarLink_Blog.Services.Interfaces
             }
         }
 
+        public async Task AddTagsToBlogPostAsync(string tagNames, int blogPostId)
+        {
+            try
+            {
+                BlogPost? post = await _context.BlogPosts.FindAsync(blogPostId);
+                if (post == null) return;
+
+                foreach(string tagName in tagNames.Split(","))
+                {
+                    if(string.IsNullOrEmpty(tagName.Trim())) continue;
+
+                    Tag? tag = await _context.Tags.FirstOrDefaultAsync(t=>t.Name.Trim().ToLower() == tagName.Trim().ToLower());
+
+                    if (tag != null)
+                    {
+                        post.Tags.Add(tag);
+                    }
+                    else
+                    {
+                        Tag newTag = new Tag() { Name = tagName.Trim() };
+                       
+
+                        post.Tags.Add(newTag);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public async Task<List<BlogPost>> GetAllBlogPostsAsync()
         {
             try

@@ -86,7 +86,7 @@ namespace StarLink_Blog.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator , Moderator")]
-        public async Task<IActionResult> Create([Bind("Id,Title,Content,CategoryId,Abstract,IsDeleted,IsPublished,BlogPostImage")] BlogPost blogPost, IEnumerable<int> selectedTags)
+        public async Task<IActionResult> Create([Bind("Id,Title,Content,CategoryId,Abstract,IsDeleted,IsPublished,BlogPostImage")] BlogPost blogPost,string stringTags)
         {
 
 
@@ -104,6 +104,7 @@ namespace StarLink_Blog.Controllers
                 {
                     ModelState.AddModelError("Title", "A similar Title or Slug has already been used! ");
                     ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", blogPost.CategoryId);
+                    ViewData["BlogPostTags"] = new MultiSelectList(await _blogPostService.GetTagsAsync(), "Id", "Name");
                     return View(blogPost);
                 }
                 blogPost.Slug = blogPost.Title!.Slugify();
@@ -122,7 +123,7 @@ namespace StarLink_Blog.Controllers
                 _context.Add(blogPost);
                 await _context.SaveChangesAsync();
 
-                await _blogPostService.AddTagsToBlogPostAsync(selectedTags, blogPost.Id);
+                await _blogPostService.AddTagsToBlogPostAsync(stringTags, blogPost.Id);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", blogPost.CategoryId);

@@ -6,6 +6,7 @@ namespace StarLink_Blog.Services.Interfaces
     public interface IBlogPostService
     {
         public Task AddTagsToBlogPostAsync(IEnumerable<int> tagIds, int blogPostId);
+        Task AddTagsToBlogPostAsync(string tagNames, int blogPostId);
 
         public Task<bool> ValidateSlugAsync(string title, int BlogPostId);
 
