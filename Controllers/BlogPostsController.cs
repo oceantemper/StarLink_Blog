@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using StarLink_Blog.Data;
 using StarLink_Blog.Extensions;
 using StarLink_Blog.Models;
+using StarLink_Blog.Services;
 using StarLink_Blog.Services.Interfaces;
 using X.PagedList;
 
@@ -23,16 +25,18 @@ namespace StarLink_Blog.Controllers
         private readonly IImageService _imageService;
         private readonly IBlogPostService _blogPostService;
         private readonly UserManager<BlogUser> _userManager;
+        private readonly IEmailSender _emailService;
 
         public BlogPostsController(ApplicationDbContext context,
                                      IImageService imageService, 
                                      IBlogPostService blogPostService,
-                                     UserManager<BlogUser> userManager)
+                                     UserManager<BlogUser> userManager, IEmailSender emailService)
         {
             _context = context;
             _imageService = imageService;
             _blogPostService = blogPostService;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         // GET: BlogPosts
@@ -264,5 +268,44 @@ namespace StarLink_Blog.Controllers
         {
           return _context.BlogPosts.Any(e => e.Id == id);
         }
+
+
+        [Authorize]
+        public async Task<IActionResult> ContactMe()
+        {
+            EmailData model = new()
+            {
+                EmailAddress = User.Identity!.Name,
+                Subject = "Contact Me: From My Blog"
+            };
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ContactMe(EmailData model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _emailService.SendEmailAsync(model.EmailAddress!, model.Subject!, model.Message!);
+                    //TODO: ADD some alert 
+
+                    return RedirectToAction("Index", "Home");
+                }
+                catch (Exception)
+                {
+                    return RedirectToAction("Index", "Home");
+                    throw;
+                }
+            }
+
+            //TODO: Add some alert 
+            return RedirectToAction("ContactMe", "BlogPosts");
+        }
+
+
     }
 }

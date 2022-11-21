@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using StarLink_Blog.Enums
+@using StarLink_Blog.Services.Interfaces
+@model IEnumerable<StarLink_Blog.Models.BlogPost>
+
+@inject IImageService _ImageService
+@inject IBlogPostService _BlogPostService
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -57,9 +64,28 @@
                                 <ul class="mainmenu">
                                     <li><a asp-action="Index" asp-controller="Home">Home</a></li>
                                     <li><a asp-controller="BlogPosts" asp-action="Index">BlogPosts</a></li>
-                                    <li><a asp-controller="Categories" asp-action="Index">Categories</a></li>
+                                   @* <li><a asp-controller="Categories" asp-action="Index">Categories</a></li>
                                     <li><a asp-controller="Comments" asp-action="Index">Comments</a></li>
-                                    <li><a asp-controller="Tags" asp-action="Index">Tags</a></li>
+                                    <li><a asp-controller="Tags" asp-action="Index">Tags</a></li>*@
+                                    @*FOREACH popular posts*@
+                                    @foreach (Category category in (await _BlogPostService.GetCategoriesAsync()).Take(4))
+                                    {
+                                        <li class="cat-item">
+                                            @*  <li><a asp-controller="Categories" asp-action="Index">Categories</a></li>*@
+                                            <a asp-action="Details" asp-controller="Categories" asp-route-id="@category.Id" class="inner">
+                                                
+                                                   @category.Name
+
+                                               
+                                            </a>
+
+                                        </li>
+
+                                    }
+
+
+
+
                                 </ul>
                                 <!-- End Mainmanu Nav -->
                             </nav>
@@ -136,8 +162,8 @@
                             <div class="inner d-flex align-items-center flex-wrap">
                                 <h5 class="follow-title mb--0 mr--20">Follow Us</h5>
                                 <ul class="social-icon color-tertiary md-size justify-content-start">
-                                    <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                    <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+                                   
+                                   
                                     <li><a href="#"><i class="fab fa-twitter"></i></a></li>
                                     <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
                                 </ul>

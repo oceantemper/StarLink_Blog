@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using StarLink_Blog.Data;
 using StarLink_Blog.Models;
+using StarLink_Blog.Services;
 using StarLink_Blog.Services.Interfaces;
 using System.Diagnostics;
 using System.Drawing.Printing;
@@ -15,12 +18,14 @@ namespace StarLink_Blog.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly IBlogPostService _blogPostService;
+       
 
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IBlogPostService blogPostService)
         {
             _logger = logger;
             _context = context;
             _blogPostService = blogPostService;
+           
 
         }
 
@@ -65,5 +70,9 @@ namespace StarLink_Blog.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+
+
     }
 }
