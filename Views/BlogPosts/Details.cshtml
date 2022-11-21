@@ -153,7 +153,7 @@
 								<h4 class="mb--0">@Model.Comments.Count() Comments</h4>
 							</div>
 							<div class="add-comment-button cerchio">
-								<a class="axil-button button-rounded" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Details", "BlogPosts", new { slug = Model.Slug })" tabindex="0"><span>Add Your Comment</span></a>
+								<a class="axil-button button-rounded" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details", "BlogPosts", new { slug = Model.Slug })" tabindex="0"><span>Add Your Comment</span></a>
 							</div>
 						</div>
 						@if (User.Identity!.IsAuthenticated)
@@ -182,7 +182,7 @@
 								</form>
 							</div>
 							<!-- End Comment Respond  -->
-						}-
+						}
 
 
 						<!-- Start Comment Area  -->
