@@ -17,6 +17,7 @@ namespace StarLink_Blog.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class RegisterConfirmationModel : PageModel
+
     {
         private readonly UserManager<BlogUser> _userManager;
         private readonly IEmailSender _sender;
